@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { authApi } from '@/lib/api';
-import { toast } from 'sonner';
 import axios from 'axios';
+import { toast } from 'sonner';
+import { useState } from 'react';
+import { authApi } from '@/lib/api';
+import { useRouter } from 'next/navigation';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -24,12 +24,7 @@ export default function LoginPage() {
             const user = res.data;
             localStorage.setItem('user', JSON.stringify(user));
             toast.success('Login Successful!');
-            
-            if (user.role === 'ADMIN') {
-                router.push('/admin/dashboard');
-            } else {
-                router.push('/student/dashboard');
-            }
+            router.push('/');
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 toast.error(error.response?.data?.message || 'Login failed');
@@ -42,8 +37,8 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <Card className="w-[400px]">
+        <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+            <Card className="w-full max-w-sm shadow-lg">
                 <CardHeader>
                     <CardTitle className="text-2xl">Login</CardTitle>
                     <CardDescription>Enter your credentials to access your account.</CardDescription>

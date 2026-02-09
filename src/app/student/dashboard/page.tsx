@@ -53,14 +53,14 @@ export default function StudentDashboard() {
         <div className="min-h-screen bg-gray-50">
             <Navbar />
             <main className="container mx-auto px-4 py-8">
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold">Welcome Back!</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Welcome Back!</h1>
                         <p className="text-gray-600">Choose a subject to see available quizzes.</p>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                     {subjects.map((subject) => (
                         <Card 
                             key={subject.id} 
@@ -71,8 +71,8 @@ export default function StudentDashboard() {
                                 <div className="bg-primary/10 p-3 rounded-lg text-primary">
                                     <BookOpen />
                                 </div>
-                                <div>
-                                    <CardTitle className="text-xl">{subject.name}</CardTitle>
+                                <div className="flex-1 min-w-0">
+                                    <CardTitle className="text-lg sm:text-xl truncate">{subject.name}</CardTitle>
                                     <CardDescription>{subject.code}</CardDescription>
                                 </div>
                             </CardHeader>

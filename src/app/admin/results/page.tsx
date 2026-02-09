@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { adminApi, Result } from '@/lib/api';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
@@ -9,6 +11,7 @@ import Navbar from '@/components/Navbar';
 import axios from 'axios';
 
 export default function AdminResultsPage() {
+    const router = useRouter();
     const [results, setResults] = useState<Result[]>([]);
 
     useEffect(() => {
@@ -40,40 +43,48 @@ export default function AdminResultsPage() {
                     <CardHeader>
                         <CardTitle>All Student Attempts</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Student Name</TableHead>
-                                    <TableHead>Quiz Title</TableHead>
-                                    <TableHead>Score</TableHead>
-                                    <TableHead>Percentage</TableHead>
-                                    <TableHead>Date</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {results.map((result) => {
-                                    const percentage = (result.score / result.totalMarks) * 100;
-                                    return (
-                                        <TableRow key={result.id}>
-                                            <TableCell className="font-medium">{result.studentName}</TableCell>
-                                            <TableCell>{result.quizTitle}</TableCell>
-                                            <TableCell>{result.score} / {result.totalMarks}</TableCell>
-                                            <TableCell>{percentage.toFixed(1)}%</TableCell>
-                                            <TableCell>{new Date(result.submittedAt).toLocaleDateString()}</TableCell>
+                        <CardContent className="p-0 sm:p-6">
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Student Name</TableHead>
+                                            <TableHead>Quiz Title</TableHead>
+                                            <TableHead className="hidden sm:table-cell">Score</TableHead>
+                                            <TableHead>Percentage</TableHead>
+                                            <TableHead className="hidden md:table-cell">Date</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
                                         </TableRow>
-                                    );
-                                })}
-                                {results.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                                            No quiz submissions found.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {results.map((result) => {
+                                            const percentage = (result.score / result.totalMarks) * 100;
+                                            return (
+                                                <TableRow key={result.id}>
+                                                    <TableCell className="font-medium">{result.studentName}</TableCell>
+                                                    <TableCell>{result.quizTitle}</TableCell>
+                                                    <TableCell className="hidden sm:table-cell">{result.score} / {result.totalMarks}</TableCell>
+                                                    <TableCell>{percentage.toFixed(1)}%</TableCell>
+                                                    <TableCell className="hidden md:table-cell">{new Date(result.submittedAt).toLocaleDateString()}</TableCell>
+                                                    <TableCell className="text-right">
+                                                        <Button size="sm" variant="ghost" onClick={() => router.push(`/student/results/${result.id}`)}>
+                                                            View Details
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        })}
+                                        {results.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                                                    No quiz submissions found.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </CardContent>
                 </Card>
             </main>
         </div>

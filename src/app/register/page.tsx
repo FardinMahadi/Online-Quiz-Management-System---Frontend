@@ -21,9 +21,11 @@ export default function RegisterPage() {
         e.preventDefault();
         setLoading(true);
         try {
-            await authApi.register({ name, email, password });
-            toast.success('Registration Successful! Please login.');
-            router.push('/login');
+            const res = await authApi.register({ name, email, password });
+            const user = res.data;
+            localStorage.setItem('user', JSON.stringify(user));
+            toast.success('Registration Successful!');
+            router.push('/');
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 toast.error(error.response?.data?.message || 'Registration failed');
@@ -36,8 +38,8 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <Card className="w-[400px]">
+        <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+            <Card className="w-full max-w-sm shadow-lg">
                 <CardHeader>
                     <CardTitle className="text-2xl">Register</CardTitle>
                     <CardDescription>Create a new account to start taking quizzes.</CardDescription>

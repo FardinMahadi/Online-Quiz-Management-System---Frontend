@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { Plus, BookOpen } from 'lucide-react';
+import { Plus, BookOpen, Edit, Trash2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
@@ -55,13 +55,24 @@ export default function AdminDashboard() {
         }
     };
 
+    const handleDeleteSubject = async (id: number) => {
+        if (!confirm('Are you sure you want to delete this subject? All associated quizzes will be lost.')) return;
+        try {
+            await adminApi.deleteSubject(id);
+            toast.success('Subject deleted successfully');
+            fetchSubjects();
+        } catch (error) {
+            toast.error('Failed to delete subject');
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             <Navbar />
             <main className="container mx-auto px-4 py-8">
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
                         <p className="text-gray-600">Manage subjects and quizzes</p>
                     </div>
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -110,39 +121,49 @@ export default function AdminDashboard() {
                         <CardHeader>
                             <CardTitle>Subjects</CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Code</TableHead>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Description</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {subjects.map((subject) => (
-                                        <TableRow key={subject.id}>
-                                            <TableCell className="font-medium">{subject.code}</TableCell>
-                                            <TableCell>{subject.name}</TableCell>
-                                            <TableCell>{subject.description}</TableCell>
-                                            <TableCell className="text-right">
-                                                <Button size="sm" variant="outline" onClick={() => router.push(`/admin/subjects/${subject.id}/quizzes`)}>
-                                                    <BookOpen size={16} className="mr-2" />
-                                                    View Quizzes
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                    {subjects.length === 0 && (
+                        <CardContent className="p-0 sm:p-6">
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <TableHeader>
                                         <TableRow>
-                                            <TableCell colSpan={4} className="text-center py-8 text-gray-500">
-                                                No subjects found. Create your first subject to get started.
-                                            </TableCell>
+                                            <TableHead className="w-[100px]">Code</TableHead>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead className="hidden md:table-cell">Description</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
                                         </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {subjects.map((subject) => (
+                                            <TableRow key={subject.id}>
+                                                <TableCell className="font-medium">{subject.code}</TableCell>
+                                                <TableCell>{subject.name}</TableCell>
+                                                <TableCell className="hidden md:table-cell">{subject.description}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button size="sm" variant="outline" onClick={() => router.push(`/admin/subjects/${subject.id}/quizzes`)}>
+                                                            <BookOpen size={16} className="sm:mr-2" />
+                                                            <span className="hidden sm:inline">Quizzes</span>
+                                                        </Button>
+                                                        <Button size="sm" variant="outline" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+                                                            <Edit size={16} />
+                                                        </Button>
+                                                        <Button size="sm" variant="outline" onClick={() => handleDeleteSubject(subject.id)} className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                                                            <Trash2 size={16} />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                        {subjects.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={4} className="text-center py-8 text-gray-500">
+                                                    No subjects found. Create your first subject to get started.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>

@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { Plus, ListTodo, ChevronLeft } from 'lucide-react';
+import { Plus, ListTodo, ChevronLeft, Trash2, Edit } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import axios from 'axios';
 
@@ -62,17 +62,30 @@ export default function AdminQuizzesPage() {
         }
     };
 
+    const handleDeleteQuiz = async (id: number) => {
+        if (!confirm('Are you sure you want to delete this quiz?')) return;
+        try {
+            await adminApi.deleteQuiz(id);
+            toast.success('Quiz deleted successfully');
+            fetchQuizzes();
+        } catch (error) {
+            toast.error('Failed to delete quiz');
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             <Navbar />
             <main className="container mx-auto px-4 py-8">
-                <div className="flex items-center gap-4 mb-8">
-                    <Button variant="ghost" size="icon" onClick={() => router.push('/admin/dashboard')}>
-                        <ChevronLeft />
-                    </Button>
-                    <div>
-                        <h1 className="text-3xl font-bold">Manage Quizzes</h1>
-                        <p className="text-gray-600">Create and manage quizzes for this subject</p>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
+                    <div className="flex items-center gap-4">
+                        <Button variant="ghost" size="icon" onClick={() => router.push('/admin/dashboard')}>
+                            <ChevronLeft />
+                        </Button>
+                        <div>
+                            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Manage Quizzes</h1>
+                            <p className="text-gray-600">Create and manage quizzes for this subject</p>
+                        </div>
                     </div>
                     <div className="ml-auto">
                         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -130,40 +143,50 @@ export default function AdminQuizzesPage() {
                     <CardHeader>
                         <CardTitle>Available Quizzes</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Title</TableHead>
-                                    <TableHead>Duration</TableHead>
-                                    <TableHead>Total Marks</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {quizzes.map((quiz) => (
-                                    <TableRow key={quiz.id}>
-                                        <TableCell className="font-medium">{quiz.title}</TableCell>
-                                        <TableCell>{quiz.durationMinutes} mins</TableCell>
-                                        <TableCell>{quiz.totalMarks}</TableCell>
-                                        <TableCell className="text-right">
-                                            <Button size="sm" variant="outline" onClick={() => router.push(`/admin/quizzes/${quiz.id}/questions`)}>
-                                                <ListTodo size={16} className="mr-2" />
-                                                Manage Questions
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {quizzes.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="text-center py-8 text-gray-500">
-                                            No quizzes found. Create your first quiz.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
+                        <CardContent className="p-0 sm:p-6">
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Title</TableHead>
+                                            <TableHead className="hidden sm:table-cell">Duration</TableHead>
+                                            <TableHead className="hidden md:table-cell">Total Marks</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {quizzes.map((quiz) => (
+                                            <TableRow key={quiz.id}>
+                                                <TableCell className="font-medium">{quiz.title}</TableCell>
+                                                <TableCell className="hidden sm:table-cell">{quiz.durationMinutes} mins</TableCell>
+                                                <TableCell className="hidden md:table-cell">{quiz.totalMarks}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button size="sm" variant="outline" onClick={() => router.push(`/admin/quizzes/${quiz.id}/questions`)}>
+                                                            <ListTodo size={16} className="sm:mr-2" />
+                                                            <span className="hidden sm:inline">Questions</span>
+                                                        </Button>
+                                                        <Button size="sm" variant="outline" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+                                                            <Edit size={16} />
+                                                        </Button>
+                                                        <Button size="sm" variant="outline" onClick={() => handleDeleteQuiz(quiz.id)} className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                                                            <Trash2 size={16} />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                        {quizzes.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={4} className="text-center py-8 text-gray-500">
+                                                    No quizzes found. Create your first quiz.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </CardContent>
                 </Card>
             </main>
         </div>

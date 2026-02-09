@@ -98,14 +98,17 @@ export default function QuizPage() {
             <Navbar />
             <main className="container mx-auto px-4 py-8">
                 <div className="max-w-3xl mx-auto">
-                    <div className="flex justify-between items-center mb-6">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
                         <div>
-                            <h1 className="text-2xl font-bold">{quiz.title}</h1>
+                            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{quiz.title}</h1>
                             <p className="text-gray-600">Question {currentQuestionIdx + 1} of {quiz.questions?.length}</p>
                         </div>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg font-mono text-xl shadow-sm">
-                            <Timer className={timeLeft && timeLeft < 60 ? 'text-red-500 animate-pulse' : ''} />
-                            {timeLeft !== null ? formatTime(timeLeft) : '--:--'}
+                        <div className="flex items-center justify-between sm:justify-start gap-4 px-4 py-2 bg-white border rounded-lg font-mono text-xl shadow-sm">
+                            <span className="text-sm font-sans font-medium text-gray-500 sm:hidden">Time Left:</span>
+                            <div className="flex items-center gap-2">
+                                <Timer className={timeLeft && timeLeft < 60 ? 'text-red-500 animate-pulse' : ''} />
+                                {timeLeft !== null ? formatTime(timeLeft) : '--:--'}
+                            </div>
                         </div>
                     </div>
 
@@ -154,14 +157,14 @@ export default function QuizPage() {
                         </Card>
                     )}
                     
-                    <div className="grid grid-cols-10 gap-2">
+                    <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                         {quiz.questions?.map((_, idx) => (
                             <button
                                 key={idx}
                                 onClick={() => setCurrentQuestionIdx(idx)}
-                                className={`w-8 h-8 rounded-full text-xs font-semibold flex items-center justify-center transition-colors
-                                    ${currentQuestionIdx === idx ? 'bg-primary text-white shadow-md' : 
-                                      answers[quiz.questions![idx].id] ? 'bg-green-100 text-green-700 border-green-200 border' : 'bg-white border text-gray-400'}`}
+                                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-semibold flex items-center justify-center transition-all
+                                    ${currentQuestionIdx === idx ? 'bg-primary text-white shadow-md ring-2 ring-primary ring-offset-2' : 
+                                      answers[quiz.questions![idx].id] ? 'bg-green-100 text-green-700 border-green-200 border' : 'bg-white border text-gray-400 hover:border-gray-300'}`}
                             >
                                 {idx + 1}
                             </button>
