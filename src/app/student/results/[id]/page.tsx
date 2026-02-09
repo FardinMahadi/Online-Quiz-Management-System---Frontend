@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { studentApi, Result } from '@/lib/api';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, CheckCircle2, XCircle, Award } from 'lucide-react';
+import type { Result } from '@/types';
+
+import { studentApi } from '@/lib/api';
 import Navbar from '@/components/Navbar';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { useParams, useRouter } from 'next/navigation';
+import { Award,XCircle, ChevronLeft, CheckCircle2 } from 'lucide-react';
+import { Card, CardTitle,CardHeader, CardContent } from '@/components/ui/card';
 
 export default function ResultDetailPage() {
     const { id } = useParams();

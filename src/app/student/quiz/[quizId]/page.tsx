@@ -1,16 +1,18 @@
 'use client';
 
-import { toast } from 'sonner';
-import Navbar from '@/components/Navbar';
-import { useEffect, useState, useCallback } from 'react';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { useParams, useRouter } from 'next/navigation';
-import { studentApi, Quiz, QuizSubmission } from '@/lib/api';
-import { Timer, Send, ChevronLeft, ChevronRight } from 'lucide-react';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import type { Quiz, QuizSubmission } from '@/types';
+
 import axios from 'axios';
+import { toast } from 'sonner';
+import { studentApi } from '@/lib/api';
+import Navbar from '@/components/Navbar';
+import { Button } from '@/components/ui/button';
+import { CardFooter } from '@/components/ui/card';
+import { useQuizTimer } from '@/hooks/useQuizTimer';
+import { useParams, useRouter } from 'next/navigation';
+import { useState,useEffect, useCallback } from 'react';
+import { QuestionCard } from '@/features/quiz/QuestionCard';
+import { Send, Timer,ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function QuizPage() {
     const { quizId } = useParams();
@@ -18,7 +20,6 @@ export default function QuizPage() {
     const [quiz, setQuiz] = useState<Quiz | null>(null);
     const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
     const [answers, setAnswers] = useState<Record<number, string>>({});
-    const [timeLeft, setTimeLeft] = useState<number | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = useCallback(async () => {
@@ -47,11 +48,12 @@ export default function QuizPage() {
         }
     }, [isSubmitting, quizId, answers, router]);
 
+    const { formattedTime, isCritical } = useQuizTimer(quiz?.durationMinutes || 0, handleSubmit);
+
     const fetchQuiz = useCallback(async () => {
         try {
             const res = await studentApi.startQuiz(Number(quizId));
             setQuiz(res.data);
-            setTimeLeft(res.data.durationMinutes * 60);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 toast.error(error.response?.data?.message || 'Failed to start quiz');
@@ -65,25 +67,6 @@ export default function QuizPage() {
     useEffect(() => {
         fetchQuiz();
     }, [fetchQuiz]);
-
-    useEffect(() => {
-        if (timeLeft === 0) {
-            handleSubmit();
-        }
-        if (!timeLeft) return;
-
-        const timer = setInterval(() => {
-            setTimeLeft(prev => (prev !== null ? prev - 1 : null));
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, [timeLeft, handleSubmit]);
-
-    const formatTime = (seconds: number) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
-    };
 
     const handleAnswerChange = (qId: number, value: string) => {
         setAnswers(prev => ({ ...prev, [qId]: value }));
@@ -106,36 +89,20 @@ export default function QuizPage() {
                         <div className="flex items-center justify-between sm:justify-start gap-4 px-4 py-2 bg-white border rounded-lg font-mono text-xl shadow-sm">
                             <span className="text-sm font-sans font-medium text-gray-500 sm:hidden">Time Left:</span>
                             <div className="flex items-center gap-2">
-                                <Timer className={timeLeft && timeLeft < 60 ? 'text-red-500 animate-pulse' : ''} />
-                                {timeLeft !== null ? formatTime(timeLeft) : '--:--'}
+                                <Timer className={isCritical ? 'text-red-500 animate-pulse' : ''} />
+                                {formattedTime}
                             </div>
                         </div>
                     </div>
 
                     {currentQuestion && (
-                        <Card className="mb-6">
-                            <CardHeader>
-                                <CardTitle className="text-lg leading-relaxed">
-                                    {currentQuestion.text}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <RadioGroup 
-                                    value={answers[currentQuestion.id] || ''} 
-                                    onValueChange={(val) => handleAnswerChange(currentQuestion.id, val)}
-                                    className="space-y-4"
-                                >
-                                    {currentQuestion.options.map((opt) => (
-                                        <div key={opt} className={`flex items-center space-x-3 p-4 border rounded-lg transition-colors hover:bg-gray-50 ${answers[currentQuestion.id] === opt ? 'border-primary bg-primary/5' : ''}`}>
-                                            <RadioGroupItem value={opt} id={`opt-${opt}`} />
-                                            <Label htmlFor={`opt-${opt}`} className="flex-1 cursor-pointer text-base">
-                                                {opt}
-                                            </Label>
-                                        </div>
-                                    ))}
-                                </RadioGroup>
-                            </CardContent>
-                            <CardFooter className="flex justify-between border-t bg-gray-50/50 pt-6">
+                        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+                            <QuestionCard 
+                                question={currentQuestion}
+                                selectedAnswer={answers[currentQuestion.id] || ''}
+                                onAnswerChange={(val) => handleAnswerChange(currentQuestion.id, val)}
+                            />
+                            <CardFooter className="flex justify-between border-t bg-gray-50/50 p-6">
                                 <Button 
                                     variant="outline" 
                                     disabled={currentQuestionIdx === 0}
@@ -154,17 +121,17 @@ export default function QuizPage() {
                                     </Button>
                                 )}
                             </CardFooter>
-                        </Card>
+                        </div>
                     )}
                     
-                    <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                        {quiz.questions?.map((_, idx) => (
+                    <div className="flex flex-wrap gap-2 justify-center sm:justify-start mt-6">
+                        {quiz.questions?.map((q, idx) => (
                             <button
-                                key={idx}
+                                key={q.id}
                                 onClick={() => setCurrentQuestionIdx(idx)}
                                 className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-semibold flex items-center justify-center transition-all
                                     ${currentQuestionIdx === idx ? 'bg-primary text-white shadow-md ring-2 ring-primary ring-offset-2' : 
-                                      answers[quiz.questions![idx].id] ? 'bg-green-100 text-green-700 border-green-200 border' : 'bg-white border text-gray-400 hover:border-gray-300'}`}
+                                      answers[q.id] ? 'bg-green-100 text-green-700 border-green-200 border' : 'bg-white border text-gray-400 hover:border-gray-300'}`}
                             >
                                 {idx + 1}
                             </button>

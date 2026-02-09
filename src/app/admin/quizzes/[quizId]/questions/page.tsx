@@ -1,19 +1,21 @@
 'use client';
 
-/* eslint-disable no-use-before-define */
+ 
 
-import { toast } from 'sonner';
-import Navbar from '@/components/Navbar';
+import type { Question } from '@/types';
+
 import axios from 'axios';
-import { useEffect, useState, useCallback } from 'react';
-import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
+import { adminApi } from '@/lib/api';
+import Navbar from '@/components/Navbar';
 import { Label } from '@/components/ui/label';
-import { adminApi, Question } from '@/lib/api';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useParams, useRouter } from 'next/navigation';
-import { Plus, ChevronLeft, Trash2, Edit } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { useState,useEffect, useCallback } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Edit, Plus,Trash2, ChevronLeft } from 'lucide-react';
+import { Dialog, DialogTitle, DialogFooter,DialogHeader, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
 export default function AdminQuestionsPage() {
     const { quizId } = useParams();
@@ -77,7 +79,7 @@ export default function AdminQuestionsPage() {
             await adminApi.deleteQuestion(id);
             toast.success('Question deleted successfully');
             fetchQuestions();
-        } catch (error) {
+        } catch {
             toast.error('Failed to delete question');
         }
     };

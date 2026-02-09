@@ -1,16 +1,18 @@
 'use client';
 
-/* eslint-disable no-use-before-define */
+ 
 
-import { useEffect, useState, useCallback } from 'react';
-import { studentApi, Subject, Quiz } from '@/lib/api';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { BookOpen, Trophy, ArrowRight } from 'lucide-react';
+import type { Quiz,Subject } from '@/types';
+
+import axios from 'axios';
 import { toast } from 'sonner';
+import { studentApi } from '@/lib/api';
 import Navbar from '@/components/Navbar';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import { Button } from '@/components/ui/button';
+import { useState,useEffect, useCallback } from 'react';
+import { Trophy,BookOpen, ArrowRight } from 'lucide-react';
+import { Card, CardTitle, CardFooter, CardHeader,CardContent, CardDescription } from '@/components/ui/card';
 
 export default function StudentDashboard() {
     const [subjects, setSubjects] = useState<Subject[]>([]);

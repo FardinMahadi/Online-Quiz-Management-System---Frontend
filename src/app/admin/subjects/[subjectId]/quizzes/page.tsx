@@ -1,20 +1,22 @@
 'use client';
 
-/* eslint-disable no-use-before-define */
+ 
 
-import { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { adminApi, Quiz } from '@/lib/api';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import type { Quiz } from '@/types';
+
+import axios from 'axios';
+import { toast } from 'sonner';
+import { adminApi } from '@/lib/api';
+import Navbar from '@/components/Navbar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { toast } from 'sonner';
-import { Plus, ListTodo, ChevronLeft, Trash2, Edit } from 'lucide-react';
-import Navbar from '@/components/Navbar';
-import axios from 'axios';
+import { Button } from '@/components/ui/button';
+import { useParams, useRouter } from 'next/navigation';
+import { useState,useEffect, useCallback } from 'react';
+import { Edit, Plus,Trash2, ListTodo, ChevronLeft } from 'lucide-react';
+import { Card, CardTitle,CardHeader, CardContent } from '@/components/ui/card';
+import { Table, TableRow, TableBody, TableCell, TableHead, TableHeader } from '@/components/ui/table';
+import { Dialog, DialogTitle, DialogFooter,DialogHeader, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
 export default function AdminQuizzesPage() {
     const { subjectId } = useParams();
@@ -68,7 +70,7 @@ export default function AdminQuizzesPage() {
             await adminApi.deleteQuiz(id);
             toast.success('Quiz deleted successfully');
             fetchQuizzes();
-        } catch (error) {
+        } catch {
             toast.error('Failed to delete quiz');
         }
     };

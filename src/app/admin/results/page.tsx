@@ -1,14 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { adminApi, Result } from '@/lib/api';
+import type { Result } from '@/types';
+
+import axios from 'axios';
+import { toast } from 'sonner';
+import { adminApi } from '@/lib/api';
+import Navbar from '@/components/Navbar';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { toast } from 'sonner';
-import Navbar from '@/components/Navbar';
-import axios from 'axios';
+import { Card, CardTitle,CardHeader, CardContent } from '@/components/ui/card';
+import { Table, TableRow, TableBody, TableCell, TableHead, TableHeader } from '@/components/ui/table';
 
 export default function AdminResultsPage() {
     const router = useRouter();

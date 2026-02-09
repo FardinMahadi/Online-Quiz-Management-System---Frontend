@@ -1,11 +1,11 @@
 'use client';
 
+import { toast } from 'sonner';
+import { useState } from 'react';
+import { authApi } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { authApi } from '@/lib/api';
-import { toast } from 'sonner';
-import { LogOut, User, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { X, Menu, User, LogOut } from 'lucide-react';
 
 export default function Navbar() {
     const router = useRouter();
@@ -18,7 +18,7 @@ export default function Navbar() {
             localStorage.removeItem('user');
             toast.success('Logged out successfully');
             router.push('/login');
-        } catch (error) {
+        } catch {
             localStorage.removeItem('user');
             router.push('/login');
         }
